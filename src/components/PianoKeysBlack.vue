@@ -1,36 +1,43 @@
 <script setup>
 import { useStore } from "@/stores/main";
 import { useKeypress } from "vue3-keypress";
+import { Piano } from "@tonejs/piano";
 
-const keys = ["D#", "E#", "G#", "A#", "B#"];
+const keys = ["Db", "Eb", "Gb", "Ab", "Bb"];
 const store = useStore();
+
+const piano = new Piano();
+piano.load();
+piano.toDestination();
+
+function pressKey(key) {
+  if (store.keyPressed.indexOf(key) === -1) {
+    store.keyPressed.push(key);
+    piano.keyDown({ note: key });
+  }
+}
+
+function releaseKey(key) {
+  store.keyPressed.splice(store.keyPressed.indexOf(key), 1);
+  piano.keyUp({ note: key });
+}
 
 const buttonPressed = ({ event }) => {
   switch (event.keyCode) {
     case 87:
-      if (store.keyPressed.indexOf(`D#${store.settings.octave}`) === -1) {
-        store.keyPressed.push(`D#${store.settings.octave}`);
-      }
+      pressKey(`Db${store.settings.octave}`);
       break;
     case 69:
-      if (store.keyPressed.indexOf(`E#${store.settings.octave}`) === -1) {
-        store.keyPressed.push(`E#${store.settings.octave}`);
-      }
+      pressKey(`Eb${store.settings.octave}`);
       break;
     case 84:
-      if (store.keyPressed.indexOf(`G#${store.settings.octave}`) === -1) {
-        store.keyPressed.push(`G#${store.settings.octave}`);
-      }
+      pressKey(`Gb${store.settings.octave}`);
       break;
     case 89:
-      if (store.keyPressed.indexOf(`A#${store.settings.octave}`) === -1) {
-        store.keyPressed.push(`A#${store.settings.octave}`);
-      }
+      pressKey(`Ab${store.settings.octave}`);
       break;
     case 85:
-      if (store.keyPressed.indexOf(`B#${store.settings.octave}`) === -1) {
-        store.keyPressed.push(`B#${store.settings.octave}`);
-      }
+      pressKey(`Bb${store.settings.octave}`);
       break;
     default:
       break;
@@ -40,19 +47,19 @@ const buttonPressed = ({ event }) => {
 const buttonClear = ({ event }) => {
   switch (event.keyCode) {
     case 87:
-      store.keyPressed.splice(store.keyPressed.indexOf(`D#${store.settings.octave}`), 1);
+      releaseKey(`Db${store.settings.octave}`);
       break;
     case 69:
-      store.keyPressed.splice(store.keyPressed.indexOf(`E#${store.settings.octave}`), 1);
+      releaseKey(`Eb${store.settings.octave}`);
       break;
     case 84:
-      store.keyPressed.splice(store.keyPressed.indexOf(`G#${store.settings.octave}`), 1);
+      releaseKey(`Gb${store.settings.octave}`);
       break;
     case 89:
-      store.keyPressed.splice(store.keyPressed.indexOf(`A#${store.settings.octave}`), 1);
+      releaseKey(`Ab${store.settings.octave}`);
       break;
     case 85:
-      store.keyPressed.splice(store.keyPressed.indexOf(`B#${store.settings.octave}`), 1);
+      releaseKey(`Bb${store.settings.octave}`);
       break;
     default:
       break;
@@ -72,20 +79,18 @@ useKeypress({
 });
 
 function mousePress(val) {
-  if (store.keyPressed.indexOf(val)) {
-    store.keyPressed.push(val);
-  }
-  setTimeout(() => store.keyPressed.splice(store.keyPressed.indexOf(val), 1), 150);
+  pressKey(val);
+  setTimeout(() => releaseKey(val), 150);
 }
 </script>
 
 <template>
   <div class="flex">
-    <div class="flex h-[105px] flex-col w-[15px] justify-end items-center relative" @click="mousePress('B#0')">
-      <p class="absolute bottom-2 text-xs text-white">B#0</p>
+    <div class="flex h-[105px] flex-col w-[15px] justify-end items-center relative" @click="mousePress('Bb0')">
+      <p class="absolute bottom-2 text-xs text-white">Bb0</p>
       <img
         src="@/assets/black-button-pressed.png"
-        v-show="store.keyPressed.indexOf('B#0') !== -1"
+        v-show="store.keyPressed.indexOf('Bb0') !== -1"
         alt=""
         class="w-[15px] h-[105px]"
       />

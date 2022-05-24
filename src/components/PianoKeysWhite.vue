@@ -1,75 +1,79 @@
 <script setup>
 import { useStore } from "@/stores/main";
 import { useKeypress } from "vue3-keypress";
+import { Piano } from "@tonejs/piano";
 
 const keys = ["C", "D", "E", "F", "G", "A", "B"];
 const store = useStore();
 
+const piano = new Piano();
+piano.load();
+piano.toDestination();
+
+function pressKey(key) {
+  if (store.keyPressed.indexOf(key) === -1) {
+    store.keyPressed.push(key);
+    piano.keyDown({ note: key });
+  }
+}
+
+function releaseKey(key) {
+  store.keyPressed.splice(store.keyPressed.indexOf(key), 1);
+  piano.keyUp({ note: key });
+}
+
 const buttonPressed = ({ event }) => {
-  console.log(event.keyCode);
-  switch (event.keyCode) {
-    case 65:
-      if (store.keyPressed.indexOf(`C${store.settings.octave}`) === -1) {
-        store.keyPressed.push(`C${store.settings.octave}`);
-      }
-      break;
-    case 83:
-      if (store.keyPressed.indexOf(`D${store.settings.octave}`) === -1) {
-        store.keyPressed.push(`D${store.settings.octave}`);
-      }
-      break;
-    case 68:
-      if (store.keyPressed.indexOf(`E${store.settings.octave}`) === -1) {
-        store.keyPressed.push(`E${store.settings.octave}`);
-      }
-      break;
-    case 70:
-      if (store.keyPressed.indexOf(`F${store.settings.octave}`) === -1) {
-        store.keyPressed.push(`F${store.settings.octave}`);
-      }
-      break;
-    case 71:
-      if (store.keyPressed.indexOf(`G${store.settings.octave}`) === -1) {
-        store.keyPressed.push(`G${store.settings.octave}`);
-      }
-      break;
-    case 72:
-      if (store.keyPressed.indexOf(`A${store.settings.octave}`) === -1) {
-        store.keyPressed.push(`A${store.settings.octave}`);
-      }
-      break;
-    case 74:
-      if (store.keyPressed.indexOf(`B${store.settings.octave}`) === -1) {
-        store.keyPressed.push(`B${store.settings.octave}`);
-      }
-      break;
-    default:
-      break;
+  if (store.settings.enabled) {
+    switch (event.keyCode) {
+      case 65:
+        pressKey(`C${store.settings.octave}`);
+        break;
+      case 83:
+        pressKey(`D${store.settings.octave}`);
+        break;
+      case 68:
+        pressKey(`E${store.settings.octave}`);
+        break;
+      case 70:
+        pressKey(`F${store.settings.octave}`);
+        break;
+      case 71:
+        pressKey(`G${store.settings.octave}`);
+        break;
+      case 72:
+        pressKey(`A${store.settings.octave}`);
+        break;
+      case 74:
+        pressKey(`B${store.settings.octave}`);
+        break;
+      default:
+        break;
+    }
   }
 };
 
 const buttonClear = ({ event }) => {
   switch (event.keyCode) {
     case 65:
-      store.keyPressed.splice(store.keyPressed.indexOf(`C${store.settings.octave}`), 1);
+      releaseKey(`C${store.settings.octave}`);
       break;
     case 83:
-      store.keyPressed.splice(store.keyPressed.indexOf(`D${store.settings.octave}`), 1);
+      releaseKey(`D${store.settings.octave}`);
       break;
     case 68:
-      store.keyPressed.splice(store.keyPressed.indexOf(`E${store.settings.octave}`), 1);
+      releaseKey(`E${store.settings.octave}`);
       break;
     case 70:
-      store.keyPressed.splice(store.keyPressed.indexOf(`F${store.settings.octave}`), 1);
+      releaseKey(`F${store.settings.octave}`);
       break;
     case 71:
-      store.keyPressed.splice(store.keyPressed.indexOf(`G${store.settings.octave}`), 1);
+      releaseKey(`G${store.settings.octave}`);
       break;
     case 72:
-      store.keyPressed.splice(store.keyPressed.indexOf(`A${store.settings.octave}`), 1);
+      releaseKey(`A${store.settings.octave}`);
       break;
     case 74:
-      store.keyPressed.splice(store.keyPressed.indexOf(`B${store.settings.octave}`), 1);
+      releaseKey(`B${store.settings.octave}`);
       break;
     default:
       break;
@@ -89,10 +93,8 @@ useKeypress({
 });
 
 function mousePress(val) {
-  if (store.keyPressed.indexOf(val)) {
-    store.keyPressed.push(val);
-  }
-  setTimeout(() => store.keyPressed.splice(store.keyPressed.indexOf(val), 1), 150);
+  pressKey(val);
+  setTimeout(() => releaseKey(val), 150);
 }
 </script>
 
